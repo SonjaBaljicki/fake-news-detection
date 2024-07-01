@@ -6,6 +6,7 @@ from nltk.stem import WordNetLemmatizer
 import re
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 
@@ -14,6 +15,7 @@ class NaiveBayes:
     def __init__(self):
         self.stop_words = set(stopwords.words('english'))
         self.lemmatizer = WordNetLemmatizer()
+        self.vectorizer = TfidfVectorizer()
         self.texts=[]
         self.tests=[]
         self.sentiments=[]
@@ -23,12 +25,13 @@ class NaiveBayes:
         self.text_counts = {'true': 0, 'fake': 0} 
         self.n_words = {'true': 0, 'fake': 0} 
         self.prior = {'true': 0, 'fake': 0}
+        self.vocab_size = 0
 
 
     def remove_stop_words(self):
-        nltk.download('stopwords')
-        nltk.download('punkt')
-        nltk.download('wordnet')
+        # nltk.download('stopwords')
+        # nltk.download('punkt')
+        # nltk.download('wordnet')
 
         file_path = 'data/train.csv'
         text = pandas.read_csv(file_path, encoding='utf-8')
@@ -42,8 +45,8 @@ class NaiveBayes:
 
         text['labels'] = text['label']
         submit['labels']=submit['label']
-        text['filtered_text'] = text['textic'].apply(self.filter_text_column)
-        test['filtered_test'] = test['textic'].apply(self.filter_text_column)
+        text['filtered_text'] = (text['textic']+text['title']+text['author']).apply(self.filter_text_column)
+        test['filtered_test'] = (test['textic']+test['title']+test['author']).apply(self.filter_text_column)
 
 
         self.texts=text['filtered_text'].values
@@ -60,10 +63,19 @@ class NaiveBayes:
         filtered_words = [self.lemmatizer.lemmatize(w.lower()) for w in word_tokens if not w.lower() in self.stop_words]
         return ' '.join(filtered_words)
 
+
     def fit(self) -> None:
+        print("dosao2")
+        # X_train_tfidf = self.vectorizer.fit_transform(self.texts)
+        # self.vocab_size = len(self.vectorizer.get_feature_names_out())
+        # for text_vector, sentiment in zip(X_train_tfidf, self.sentiments):
+
         for text, sentiment in zip(self.texts, self.sentiments):
+            # indices = text_vector.nonzero()[1]
             words = text.split()
             for word in words: 
+            # for idx in indices:
+                # word = self.vectorizer.get_feature_names_out()[idx]
                 if str(sentiment) == '1': self.fake_word_counts[word] = self.fake_word_counts.get(word, 0) + 1
                 if str(sentiment) == '0': self.true_word_counts[word] = self.true_word_counts.get(word, 0) + 1
 
@@ -84,12 +96,14 @@ class NaiveBayes:
         log_p_words_given_fake_sentiment = []
         log_p_words_given_true_sentiment = []
 
+        
         for word in words:
-            p_word_given_fake = (self.fake_word_counts.get(word, 0) + 1) / (self.n_words['fake']+len(self.fake_word_counts))
-            p_word_given_true = (self.true_word_counts.get(word, 0) + 1) / (self.n_words['true']+len(self.true_word_counts))
+            p_word_given_fake = (self.fake_word_counts.get(word, 0) + 1) / (self.n_words['fake'] + len(self.fake_word_counts))
+            p_word_given_true = (self.true_word_counts.get(word, 0) + 1) / (self.n_words['true'] + len(self.true_word_counts))
 
             log_p_words_given_fake_sentiment.append(np.log(p_word_given_fake))
             log_p_words_given_true_sentiment.append(np.log(p_word_given_true))
+
 
         log_p_text_given_fake = np.sum(log_p_words_given_fake_sentiment)
         log_p_text_given_true = np.sum(log_p_words_given_true_sentiment)
@@ -98,7 +112,6 @@ class NaiveBayes:
         log_p_text_is_true = log_p_text_given_true + np.log(self.prior['true'])
 
         return log_p_text_is_fake>log_p_text_is_true
-    
 
 
     def evaluate_model(self,true_labels, predicted_labels):
