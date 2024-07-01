@@ -1,3 +1,5 @@
 nltk
 pandas
 scikit-learn
+tensorflow
+keras
