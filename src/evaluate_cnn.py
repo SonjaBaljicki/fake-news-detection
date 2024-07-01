@@ -8,7 +8,7 @@ from keras.src.optimizers import Adam,Adadelta
 
 def evaluate_model(model, X_test, Y_test):
     scores = model.evaluate(X_test, Y_test, verbose=0)
-
+    print(scores)
     print("Accuracy: %.2f%%" % (scores[1] * 100))
 
     fake_cnt, true_cnt, fake_correct, true_correct = 0, 0, 0, 0
