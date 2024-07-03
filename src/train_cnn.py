@@ -71,8 +71,6 @@ def split_dataset():
 
 def fit_model(model, X_train, Y_train, X_val, Y_val):
 
-    print("Fit")
-
     y_ints = [int(y[0]) for y in Y_train]
     class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_ints), y=y_ints)
     class_weight_dict = dict(enumerate(class_weights))
@@ -86,9 +84,6 @@ def fit_model(model, X_train, Y_train, X_val, Y_val):
     
 
 if __name__ == '__main__':
-
-    # texts, is_fake = remove_stop_words()
-    # texts = preparing_data(texts)
 
     X_train, X_test, X_val, Y_train, Y_test, Y_val = split_dataset()
 

@@ -65,7 +65,6 @@ class NaiveBayes:
 
 
     def fit(self) -> None:
-        print("dosao2")
         # X_train_tfidf = self.vectorizer.fit_transform(self.texts)
         # self.vocab_size = len(self.vectorizer.get_feature_names_out())
         # for text_vector, sentiment in zip(X_train_tfidf, self.sentiments):

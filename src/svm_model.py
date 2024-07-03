@@ -51,8 +51,7 @@ class SVM:
 
 
     def fit(self, X, y):
-        print("dosaooo")
-        nsamples, n_features = X.shape
+        _, n_features = X.shape
         y_ = np.where(y == 0, -1, 1) 
 
         self.weights = np.zeros(n_features)
@@ -80,8 +79,6 @@ if __name__=="__main__":
     text,sentiments = svm.remove_stop_words()
     X = vectorizer.fit_transform(text).toarray()
     y = sentiments
-
-    # X, y = X[:1500], y[:1500]
 
     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=123)
 
