@@ -1,4 +1,4 @@
-# Project for Class: Computer Intelligence (AI)
+# Project for class Computer Intelligence (AI)
 # Fake News Detection
 This project aims to detect fake news from various texts using different models for training and evaluation.
 
